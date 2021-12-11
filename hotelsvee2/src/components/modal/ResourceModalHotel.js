@@ -8,15 +8,18 @@ import { uiCloseModal, uiCloseModalDelete } from '../../actions/ui';
 export const ResourceModalHotel = () => {
 
   const dispatch = useDispatch();
-  const { modalOpenHotel, modalDelete, modalNew, idSelector, hotel } = useSelector(state => state.ui);
+  const { modalOpenHotel, modalDelete, modalNew, idSelector,hotelSelector } = useSelector(state => state.ui);
+  const {hotels} = useSelector(state => state.hotel)
 
-  const [formValues, setFormValues] = useState(hotel);
+  const [formValues, setFormValues] = useState(hotels);
   const {id, name,address,rating,countryId} = formValues;
-
-  useEffect(() => {
-      setFormValues( hotel );
   
-}, [ setFormValues, modalOpenHotel])
+  useEffect(() => {
+
+      setFormValues( hotels );
+      setFormValues( hotelSelector );
+
+}, [ setFormValues, modalOpenHotel, hotels,hotelSelector])
     
   
   const closeModal = () => {

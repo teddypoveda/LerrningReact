@@ -1,36 +1,33 @@
 import React,{useEffect} from 'react'
 import { BrowserRouter as Router,
     Switch,
-    Redirect,
     Route
     } from 'react-router-dom';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Navbar, Container } from 'react-bootstrap';
 import { LoginScreen } from '../components/auth/LoginScreen';
 import { Dates } from '../components/ui/Dates';
 import { useJwt } from "react-jwt";
 import { LoginBotton } from '../components/ui/LoginBotton';
-import { startChecking } from '../actions/auth';
 import { CountryScreen } from '../components/country/CountryScreen';
 import { Dashboard } from '../components/dashboard/Dashboard';
 import { HotelScreen } from '../components/hotel/HotelScreen';
+import { PublicRoute } from './PublicRoute';
+import { RegisterScreen } from '../components/user/RegisterScreen';
+import { PrivateRoute } from './PrivateRoute';
 
 
-
-export const AppRouters = ({history}) => {
+export const AppRouters = () => {
     const dispatch = useDispatch();
-    const {checking} = useSelector(state => state.auth)
+    const {checking} = useSelector(state => state.auth);
+    
     const token = localStorage.getItem('token')||'';
-    const { decodedToken, isExpired } = useJwt(token);
-    localStorage.setItem('userData', decodedToken);
+    const {  isExpired } = useJwt(token);
     localStorage.setItem('tokenExpired', isExpired);
-    (isExpired)||<Redirect to="dashboard"/>
-
+    
     useEffect(() => {
-
-        dispatch( startChecking() )
-
-    }, [dispatch]);
+         //dispatch(startChecking());
+    }, [!isExpired,checking]);
 
     return (
     <>
@@ -45,34 +42,50 @@ export const AppRouters = ({history}) => {
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />
+            Hotels
             </Navbar.Brand>
-
+            
+            
              {(isExpired)?<LoginBotton/>:<Dates />} 
             
         </Container>
   </Navbar>
   
     <Router>
-    
+   
         <Switch>
+            <Route path="/register" component={ RegisterScreen } />
 
-            <Route path="/login" render={()=>{
-                return (checking)?<LoginScreen/>:<Dashboard/>
-            }
-            }/>
+            <PrivateRoute 
+                exact 
+                path="/login" 
+                component={ LoginScreen }
+                isAuthenticated={ isExpired }
+ 
+            /> 
+
+            <PublicRoute 
+                exact 
+                path="/dashboard" 
+                component={ Dashboard }
+                isAuthenticated={ isExpired }
+ 
+            />
+            
+
             <Route path="/dashboard" render={()=>{
-                return (isExpired)?<LoginScreen/>:<Dashboard/>
+                return (isExpired)?<Dashboard/>:<LoginScreen/>;
             }
             }/>
             <Route path="/hotel" render={()=>{
-                return (isExpired)?<LoginScreen/>:<HotelScreen/>
+                return (isExpired)?<HotelScreen/>:<LoginScreen/>;
             }
             }/>
             <Route path="/country" render={()=>{
-                return (isExpired)?<LoginScreen/>:<CountryScreen/>
+                return (isExpired)?<CountryScreen/>:<LoginScreen/>;
             }
             }/>
-                
+
 
         </Switch> 
         

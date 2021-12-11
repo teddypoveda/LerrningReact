@@ -4,32 +4,31 @@ import { useForm } from '../../hooks/useForm';
 import { startLogin } from '../../actions/auth';
 import './login.css';
 
-export const LoginScreen = ({history}) => {
+export const LoginScreen = () => {
 
     const dispatch = useDispatch();
-   // const { checking } = useSelector( state => state.auth);
-    
+
     const [ formLoginValues, handleLoginInputChange ] = useForm({
-        lEmail: 'user@example.com',
+        lEmail: '',
         lPassword: 'Contraseñ4.'
     });
 
     const { lEmail, lPassword } = formLoginValues;
 
-    const handleLogin = ( e ) => {
+    const handleLogin = async( e ) => {
         e.preventDefault();
-        dispatch( startLogin( lEmail, lPassword ) );
+        dispatch( startLogin( lEmail, lPassword ) );        
     }
-
+    
 
     
     return (
-        
-            <div className="row">
-                <div className="col-md-6 login-form-1">
-                    <h3>Ingreso</h3>
-                    <form onSubmit={ handleLogin }>
-                        <div className="form-group">
+        <div className="login">
+            <div className=" mx-auto w-50 bg-light border shadow-lg bg-body rounded border border-secondary">
+                <div className="p-7">
+                    <h3 className="p-3 mb-2 bg-secondary text-white">Ingreso</h3>
+                    <form onSubmit={ handleLogin } className="px-3">
+                        <div className="form-group pt-4">
                             <input 
                                 type="text"
                                 className="form-control"
@@ -39,7 +38,7 @@ export const LoginScreen = ({history}) => {
                                 onChange={ handleLoginInputChange }
                             />
                         </div>
-                        <div className="form-group">
+                        <div className="form-group pt-3">
                             <input
                                 type="password"
                                 className="form-control"
@@ -49,15 +48,16 @@ export const LoginScreen = ({history}) => {
                                 onChange={ handleLoginInputChange }
                             />
                         </div>
-                        <div className="form-group">
+                        <div className="form-group pt-5 pb-3">
                             <input 
                                 type="submit"
-                                className="btnSubmit"
+                                className="btn btn-primary"
                                 value="Login" 
                             />
                         </div>
                     </form>
                 </div>
+            </div>
         </div>
     )
 }

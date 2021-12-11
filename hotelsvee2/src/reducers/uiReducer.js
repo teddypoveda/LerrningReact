@@ -6,12 +6,17 @@ const initialState = {
     modalDelete:false,
     modalNew: true,
     idSelector:null,
-    hotel:{id:'',
+    hotelSelector:{id:'',
     country:'',
     name:'',
     address:'',
     rating:'',
-    countryId:''}
+    countryId:''},
+    countrySelector:{
+        id:'',
+        name:'',
+        shortName:''
+    }
 }
 
 
@@ -28,6 +33,7 @@ export const uiReducer = ( state = initialState, action ) => {
         case types.uiOpenModalCountry:
             return {
                 ...state,
+                modalNew:true,
                 modalOpenCountry: true
             }
         case types.uiOpenModalHotelId:
@@ -35,8 +41,16 @@ export const uiReducer = ( state = initialState, action ) => {
                 ...state,
                 modalOpenHotel: true,
                 modalNew:false,
-                hotel:action.hotelUpdate
+                hotelSelector:action.hotelUpdate
             }
+        case types.uiOpenModalCountryId:
+            return {
+                ...state,
+                modalOpenCountry: true,
+                modalNew:false,
+                countrySelector:action.countryUpdate
+            }
+            
         case types.uiModalDelete:
             return {
                 ...state,
@@ -52,7 +66,14 @@ export const uiReducer = ( state = initialState, action ) => {
             return {
                 ...state,
                 modalOpenCountry: false,
-                modalOpenHotel:false
+                modalOpenHotel:false,
+                hotelSelector: {id:'',
+                country:'',
+                name:'',
+                address:'',
+                rating:'',
+                countryId:''},
+                countrySelector:{id:'', name:'',shortName:''}
             }
         case types.eventClearActiveEvent:
             return {

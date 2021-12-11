@@ -1,10 +1,11 @@
 import React from 'react'
-import { ResourceModalCountry } from '../modal/ResourceModalCountry'
+import { ResourceModalCountry } from '../modal/ResourceModalCountry';
+import './dashboard.css';
 
 
 export const Dashboard = () => {
     return (
-        <div>
+        <div className="dashboard">
             <ResourceModalCountry/>
         </div>
     )

@@ -1,15 +1,15 @@
 import { types } from '../types/types';
 
-    // id:'',
-    // country:'',
-    // name:'',
-    // address:'',
-    // rating:'',
-    // countryId:''
+   
 
 
 const initialState = {
-    hotels: [],
+    hotels: [{id:'',
+    country:'',
+    name:'',
+    address:'',
+    rating:'',
+    countryId:''}],
     activeEvent: null
 };
 
@@ -20,39 +20,39 @@ export const hotelReducer = ( state = initialState, action ) => {
         
 
         
-        case types.eventAddNewHotel:
+        case types.eventAddHotel:
             return {
                 ...state,
                 hotels: [
                     ...state.hotels,
                     action.payload
-                ]
+                ],
+                hola:'me ejecuto'
             }
 
         case types.eventHotelGet:
             return {
                 ...state,
-                hotels: [
-                    ...state.hotels,
-                    action.payload
-                ]
+                hotels: action.payload
+                
             }
 
 
 
-        case types.eventUpdated:
+        case types.eventUpdatedHotel:
             return {
                 ...state,
-                events: state.hotels.map(
+                hotels: state.hotels.map(
                     e => ( e.id === action.payload.id ) ? action.payload : e
-                )
+                ),
+                datos: action.payload.id
             }
         
-        case types.eventDeleted:
+        case types.eventDeletedHotel:
             return {
                 ...state,
-                events: state.hotels.filter(
-                    e => ( e.id !== state.activeEvent.id )
+                hotels: state.hotels.filter(
+                    e => ( e.id !== action.payload )
                 ),
                 activeEvent: null
             }

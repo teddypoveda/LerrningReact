@@ -4,9 +4,9 @@ import { types } from '../types/types';
 
 const initialState = {
     countries: [{
-        id:'7',
-        name:'Bahamas',
-        shortName:'BH'
+        id:'',
+        name:'',
+        shortName:''
     }],
     activeEvent: null
 };
@@ -16,15 +16,21 @@ export const countryReducer = ( state = initialState, action ) => {
 
     switch ( action.type ) {
         
-        case types.eventAddNew:
+        case types.eventAddCountry:
             return {
                 ...state,
-                events: [
-                    ...state.events,
-                    action.payload
-                ]
+                countries:[
+                    ...state.countries,
+                     action.payload
+                ],
+                hola:'me ejecuto'
             }
-    
+        case types.eventCountryGet:
+            return {
+                ...state,
+                countries: action.payload                
+            }
+
         case types.eventClearModal:
             return {
                 ...state,
@@ -32,19 +38,19 @@ export const countryReducer = ( state = initialState, action ) => {
             }
 
 
-        case types.eventUpdated:
+        case types.eventUpdatedCountry:
             return {
                 ...state,
-                events: state.events.map(
+                countries: state.countries.map(
                     e => ( e.id === action.payload.id ) ? action.payload : e
                 )
             }
         
-        case types.eventDeleted:
+        case types.eventDeletedCountry:
             return {
                 ...state,
-                events: state.events.filter(
-                    e => ( e.id !== state.activeEvent.id )
+                countries: state.countries.filter(
+                    e=>(e.id !== action.payload )
                 ),
                 activeEvent: null
             }

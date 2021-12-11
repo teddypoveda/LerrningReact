@@ -1,47 +1,58 @@
-import { fetchSinToken } from '../helpers/fetch';
+import { fetchSinToken, fetchConToken } from '../helpers/fetch';
 import { types } from '../types/types';
 import Swal from 'sweetalert2';
-//import { eventLogout } from './events';
+
 
 
 export const startLogin = ( email, password ) => {
     return async( dispatch ) => {
 
-        const resp = await fetchSinToken( 'Account/login', { email, password }, 'POST' );
+        const resp = await fetchSinToken( 'account/login', { email, password }, 'POST' );
         const body = await resp.json();
-        
-        if( body.token ) {
-            localStorage.setItem('token', body.token );
-            localStorage.setItem('token-init-date', new Date().getTime() );
 
-            dispatch( login({
-                uid: body.uid,
-                name: body.name
-            }) )
-        } else {
-            Swal.fire('Error', body.msg, 'error');
+        
+        if( resp.ok) {
+            localStorage.setItem('token', body.token );
+            const response = await fetchConToken( 'account/tokenValid', {}, 'GET' );
+            const bodies = await response.json();
+            console.log(bodies);
+            if(response.ok){
+                dispatch( login({
+                    firstName: bodies.firstName,
+                    lastName: bodies.lastName,
+                    rol: bodies.rol
+                }) );
+                localStorage.setItem('firstName',bodies.firstName);
+                localStorage.setItem('lastName',bodies.lastName);
+                localStorage.setItem('rol',bodies.rol);
+                localStorage.setItem('checking',true);
+
+                Swal.fire('Ingreso Exitoso!', 'Bienvenido al sisstema de hoteles!', 'success');
+            }
+        }else{
+            Swal.fire('Error', 'Email o Contraseña invalida', 'error');
         }
         
 
     }
 }
 
-export const startRegister = ( email, password, name ) => {
-    return async( dispatch ) => {
-        
-        const resp = await fetchSinToken( 'auth/new', { email, password, name }, 'POST' );
-        const body = await resp.json();
-
-        if( body.ok ) {
-            localStorage.setItem('token', body.token );
-            localStorage.setItem('token-init-date', new Date().getTime() );
-
-            dispatch( login({
-                uid: body.uid,
-                name: body.name
-            }) )
-        } else {
-            Swal.fire('Error', body.msg, 'error');
+export const startRegister = (  email, firstName, lastName, rol, password ) => {
+    return async(dispatch) => {
+        (!rol==='')||(rol='Administrator');
+        //console.log(rol);
+        try {
+            const roles=[rol];
+            const resp = await fetchSinToken( 'account/register', { email, firstName, lastName,roles, password}, 'POST' );
+            
+            if( resp.ok ) {
+                Swal.fire('Registro Exitoso!', 'Ahora puedes ingresar al sisstema!', 'success');
+            } else {
+                Swal.fire('Error', resp.msg, 'error');
+            }
+            
+        } catch (error) {
+            console.log(error);
         }
 
 
@@ -50,28 +61,22 @@ export const startRegister = ( email, password, name ) => {
 
 export const startChecking = () => {
     return async(dispatch) => {
-        //const token=localStorage.getItem('token');
-        //const tokenValid=localStorage.getItem('tokenExpired');
 
-        // if(token){
-        //     (tokenValid)?console.log("tokenValid: "+tokenValid):window.location.replace("http://localhost:3000/login");
-        // }else{
-        //     window.location.replace("http://localhost:3000/login");
-        // }
+        localStorage.setItem('tokenExpired',false);
 
-        // const resp = await fetchConToken( 'auth/renew' );
-        // const body = await resp.json();
+    
+       
 
         // if( body.ok ) {
-        //     localStorage.setItem('token', body.token );
-        //     localStorage.setItem('token-init-date', new Date().getTime() );
+        //     // localStorage.setItem('token', body.token );
+        //     // localStorage.setItem('token-init-date', new Date().getTime() );
 
-        //     dispatch( login({
-        //         uid: body.uid,
-        //         name: body.name
-        //     }) )
+        //     // dispatch( login({
+        //     //     uid: body.uid,
+        //     //     name: body.name
+        //     // }) )
         // } else {
-        //     dispatch( checkingFinish() );
+        //     //dispatch( checkingFinish() );
         // }
     }
 }
@@ -87,11 +92,12 @@ const login = ( user ) => ({
 
 
 export const startLogout = () => {
-    return ( dispatch ) => {
+    return (  ) => {
 
         localStorage.clear();
-        // dispatch( eventLogout() );
-        // dispatch( logout() );
+        localStorage.setItem('tokenExpired', true);
+        window.location.href = window.location.href;
+
     }
 }
 

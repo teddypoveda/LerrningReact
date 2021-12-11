@@ -1,80 +1,68 @@
-import React, {useState, useEffect} from 'react'
+import React, { useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-
-//import moment from 'moment';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { eventAddNewCountry } from '../../actions/events';
-import { uiCloseModal } from '../../actions/ui';
+import { eventAddNewCountry, eventUpdateCountry, eventDeleteCountry } from '../../actions/events';
+import { uiCloseModal, uiCloseModalDelete } from '../../actions/ui';
 
 
 
-const initEvent={
-  id:'',
-  name:'',
-  shortName:''
-}
-
-const State={
-    data:[],
-    modalInsertar: true,
-    modalEliminar: false,
-    };
 
 export const ResourceModalCountry = () => {
 
   const dispatch = useDispatch();
-  const { modalOpen } = useSelector(state => state.ui);
-  const { activeEvent } = useSelector( state => state.country );
+  const { modalOpenCountry,countrySelector, modalNew, modalDelete,idSelector } = useSelector(state => state.ui);
+  const { countries } = useSelector( state => state.country );
   
-  const [state, setstate] = useState(State);
-  const [formValues, setFormValues] = useState(initEvent)
-
-  const {id, name, shortName } = formValues;
-  
+  const [FormValues, setFormValues] = useState(countries);
+  const { id, name, shortName}  = FormValues||{};
+  console.log(countrySelector);
   useEffect(() => {
-    if ( activeEvent ) {
-        setFormValues( activeEvent );
-    } else {
-        setFormValues( initEvent );
-    }
-  }, [activeEvent, setFormValues])
+    setFormValues(FormValues);
+    setFormValues( countrySelector );
+
+  }, [ countrySelector]);
+
+  
     
   const closeModal = () => {
     // TODO: cerrar el modal
     dispatch( uiCloseModal() );
-    setFormValues( initEvent );
+    dispatch(uiCloseModalDelete());
+    setFormValues( countries );
   }
       
     
-  const handleChange= (e)=>{
+  const handleChange=({target})=>{
     setFormValues({
-        ...formValues,
-        start: e
-    })
+      ...FormValues,
+      [target.name]: target.value
+  });
+  }
+  const countryDelete = ()=>{
+    dispatch(eventDeleteCountry(idSelector));
   }
 
-  const handleSubmitForm= (e)=>{
+  const handleSubmitForm= async(e)=>{
     e.preventDefault();
-    dispatch( eventAddNewCountry({
-      ...formValues,
-      id:'',
-      name:'',
-      shortName:''
-    })
-    );
-    console.log(formValues);
-  }
+     if(modalNew){
+      delete FormValues.id; 
+      dispatch(await eventAddNewCountry(FormValues));
+      
+    }else{
+      dispatch(await eventUpdateCountry(FormValues));
+    }
 
+  }
 
     
   return (
     
   <>
-    <Modal  isOpen={modalOpen}
+    <Modal  isOpen={modalOpenCountry}
             centered={true}
             onRequestClose={ closeModal }>
       <ModalHeader style={{display: 'block'}}>
-        <span  onClick={()=>handleSubmitForm()}> { (activeEvent)? 'Editar evento': 'Nuevo evento' }</span>
+        <span  onClick={()=>handleSubmitForm()}> { (modalNew)?'Nuevo evento':'Editar evento'}</span>
       </ModalHeader>
       <ModalBody>
         <div className="form-group">
@@ -91,10 +79,10 @@ export const ResourceModalCountry = () => {
       </ModalBody>
 
       <ModalFooter>
-        {state.tipoModal==='insertar'?
-          <button className="btn btn-success" >
+        {modalNew?
+          <button className="btn btn-success" onClick={handleSubmitForm}>
           Insertar
-        </button>: <button className="btn btn-primary" >
+        </button>: <button className="btn btn-primary"onClick={handleSubmitForm} >
           Actualizar
         </button>
         }
@@ -102,13 +90,13 @@ export const ResourceModalCountry = () => {
       </ModalFooter>
     </Modal>
 
-    <Modal isOpen={state.modalEliminar}>
+    <Modal isOpen={modalDelete}>
       <ModalBody>
-          Estás seguro que deseas eliminar a la empresa {formValues && name}
+          Estás seguro que deseas eliminar el país {name}
       </ModalBody>
       <ModalFooter>
-        <button className="btn btn-danger" >Sí</button>
-        <button className="btn btn-secundary" onClick={()=>setstate({modalEliminar: false})}>No</button>
+        <button className="btn btn-danger" onClick={()=>countryDelete()}>Sí</button>
+        <button className="btn btn-secundary" onClick={()=>closeModal()}>No</button>
       </ModalFooter>
     </Modal>
   </>

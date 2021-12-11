@@ -12,8 +12,7 @@ const fetchSinToken = ( endpoint, data, method = 'GET' ) => {
                 method: method,
                 headers: {
                     'Accept': 'application/json',
-                    'Content-type': 'application/json',
-                    'Authorization': 'Bearer'
+                    'Content-type': 'application/json'
                 },
                 body: JSON.stringify( data )
             });
@@ -28,7 +27,7 @@ const fetchConToken = ( endpoint, data, method = 'GET' ) => {
     try {
         const url = `${ baseUrl }/${ endpoint }`;
         const token = localStorage.getItem('token') || '';
-
+        
         if ( method === 'GET' ) {
             return fetch( url, {
                 method,
